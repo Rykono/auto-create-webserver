@@ -21,12 +21,12 @@ sudo a2dissite 000-default.conf
 sudo a2enmod rewrite
 sudo a2ensite $domainname.conf
 sudo service apache2 restart
-mkdir /var/www/html/$domainname.com
-cd /var/www/html/$domainname.com
+mkdir /var/www/html/$domainname
+cd /var/www/html/$domainname
 git init
 git remote add origin https://$githubuser:$githubtoken@github.com/$githubuser/$githubres
 git pull origin master
-cd /var/www/html/$domainname.com
+cd /var/www/html/$domainname
 sudo usermod -a -G www-data ubuntu
 sudo find . -type f -exec chmod 664 {} \;   
 sudo find . -type d -exec chmod 775 {} \;
