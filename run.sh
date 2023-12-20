@@ -1,11 +1,14 @@
+read -p "Domain Name (No .com): " domainname
+read -p "Github Token: " githubtoken
+read -p "Github User: " githubuser
+read -p "Github Repository (xxxxx.git): " githubres
 sudo apt update && sudo apt upgrade -y
-sudo apt install apache2 mysql-server php php-bcmath php-ctype php-json php-xml php-pdo php-mbstring php-curl redis composer -y
-sudo curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+sudo apt install apache2 mysql-server php php-bcmath php-ctype php-json php-xml php-pdo php-mbstring php-curl php-gd php-imagick php-zip redis composer -y
+curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
 export NVM_DIR="$HOME/.nvm" 
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 source ~/.bashrc
-read -p "Domain Name (No .com): " domainname
 if test -f "/etc/apache2/sites-available/$domainname"; then
     echo "$domainname exists. Deleting and recreating"
     rm -R /etc/apache2/sites-available/$domainname
@@ -21,15 +24,16 @@ sudo service apache2 restart
 mkdir /var/www/html/$domainname.com
 cd /var/www/html/$domainname.com
 git init
-read -p "Github Token: " githubtoken
-read -p "Github User: " githubuser
-read -p "Github Repository (xxxxx.git): " githubres
 git remote add origin https://$githubuser:$githubtoken@github.com/$githubuser/$githubres
 git pull origin master
+cd /var/www/html/$domainname.com
+sudo usermod -a -G www-data ubuntu
+sudo find . -type f -exec chmod 664 {} \;   
+sudo find . -type d -exec chmod 775 {} \;
+sudo chgrp -R www-data storage bootstrap/cache
+sudo chmod -R ug+rwx storage bootstrap/cache
 composer install
 nvm install --lts
 nvm use --lts
 npm install
 npm run dev
-
-
