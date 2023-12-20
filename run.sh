@@ -21,17 +21,17 @@ sudo a2dissite 000-default.conf
 sudo a2enmod rewrite
 sudo a2ensite $domainname.conf
 sudo service apache2 restart
-mkdir /var/www/html/$domainname
-cd /var/www/html/$domainname
-git init
-git remote add origin https://$githubuser:$githubtoken@github.com/$githubuser/$githubres
-git pull origin master
-cd /var/www/html/$domainname
+mkdir /var/www/html/$domainname.com
+cd /var/www/html/$domainname.com
 sudo usermod -a -G www-data ubuntu
+sudo chown -R ubuntu:www-data .
 sudo find . -type f -exec chmod 664 {} \;   
 sudo find . -type d -exec chmod 775 {} \;
 sudo chgrp -R www-data storage bootstrap/cache
 sudo chmod -R ug+rwx storage bootstrap/cache
+git init
+git remote add origin https://$githubuser:$githubtoken@github.com/$githubuser/$githubres
+git pull origin master
 composer install
 nvm install --lts
 nvm use --lts
