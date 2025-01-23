@@ -44,73 +44,32 @@ export NVM_DIR="$HOME/.nvm"
 source "$NVM_DIR/nvm.sh"
 source "$NVM_DIR/bash_completion"
 
-# Check and handle existing configuration
-config_path="/etc/apache2/sites-available/$domainname.conf"
-if [ -f "$config_path" ]; then
-    echo "Configuration for $domainname exists. Deleting and recreating."
-    run_with_progress "sudo rm \"$config_path\"" "Removing existing Apache configuration"
+# Check and handle 000-default.conf
+echo "Configuring Apache..."
+if sudo a2dissite 000-default.conf &> /dev/null; then
+    echo -e "[Disabling default site] \e[32mDone\e[0m" # Green "Done"
+else
+    echo -e "[Disabling default site] \e[33mSkipped (already disabled or not found)\e[0m" # Yellow "Skipped"
 fi
 
-# Create Apache configuration
-echo "Creating Apache configuration..."
-sudo tee "$config_path" > /dev/null <<EOF
-<VirtualHost *:80>
-    ServerName $domainname.com
-    ServerAlias www.$domainname.com
-    ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/html/$domainname.com/public
-    #Redirect / https://$domainname.com # Uncomment when SSL is active
+# Check and handle existing project directory
+project_dir="/var/www/html/$domainname.com"
+if [ -d "$project_dir" ]; then
+    echo "Project directory already exists: $project_dir"
+    read -p "Do you want to delete the existing project and start over? (y/N): " delete_project
+    if [[ "$delete_project" =~ ^[Yy]$ ]]; then
+        run_with_progress "sudo rm -rf \"$project_dir\"" "Deleting existing project directory"
+    else
+        echo -e "\e[31mScript stopped. Existing project retained.\e[0m"
+        exit 0
+    fi
+fi
 
-    <Directory "/var/www/html/$domainname.com/public/">
-        Options FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog \${APACHE_LOG_DIR}/error.log
-    CustomLog \${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-
-<IfModule mod_ssl.c>
-    <VirtualHost *:443>
-        ServerName $domainname.com
-        DocumentRoot /var/www/html/$domainname.com/public
-
-        <Directory />
-            Require all denied
-            Options None
-            AllowOverride None
-        </Directory>
-
-        <Directory "/var/www/html/$domainname.com/public/">
-            Options FollowSymLinks
-            AllowOverride All
-            Require all granted
-        </Directory>
-
-        ErrorLog \${APACHE_LOG_DIR}/$domainname/error.log
-        CustomLog \${APACHE_LOG_DIR}/$domainname/access.log combined
-
-        SSLEngine on
-        SSLProtocol all
-        SSLCertificateFile /etc/apache2/ssl/$domainname.com.pem
-        SSLCertificateKeyFile /etc/apache2/ssl/$domainname.com.key
-    </VirtualHost>
-</IfModule>
-EOF
-
-# Enable Apache configuration
-echo "Configuring Apache..."
-run_with_progress "sudo a2dissite 000-default.conf > /dev/null" "Disabling default site"
-run_with_progress "sudo a2enmod rewrite > /dev/null" "Enabling mod_rewrite"
-run_with_progress "sudo a2ensite $domainname.conf > /dev/null" "Enabling site configuration"
-run_with_progress "sudo service apache2 restart > /dev/null" "Restarting Apache"
-
-# Set up project directory
+# Create project directory
 echo "Setting up project directory..."
-run_with_progress "sudo mkdir -p /var/www/html/$domainname.com" "Creating project directory"
-run_with_progress "sudo chown -R ubuntu:www-data /var/www/html/$domainname.com" "Setting directory ownership"
-cd "/var/www/html/$domainname.com"
+run_with_progress "sudo mkdir -p \"$project_dir\"" "Creating project directory"
+run_with_progress "sudo chown -R ubuntu:www-data \"$project_dir\"" "Setting directory ownership"
+cd "$project_dir"
 
 # Git setup
 echo "Setting up Git repository..."
