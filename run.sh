@@ -86,10 +86,13 @@ run_with_progress "sudo chmod -R ug+rwx storage bootstrap/cache" "Setting permis
 
 # Install dependencies
 echo "Installing project dependencies..."
-run_with_progress "composer install > /dev/null" "Installing Composer dependencies"
-run_with_progress "nvm install --lts > /dev/null" "Installing Node.js LTS version"
-run_with_progress "nvm use --lts > /dev/null" "Using Node.js LTS version"
-run_with_progress "npm install > /dev/null" "Installing NPM dependencies"
-run_with_progress "npm run dev > /dev/null" "Building front-end assets"
+echo "Running Composer install..."
+composer install
+echo "Running NVM setup and NPM install..."
+nvm install --lts
+nvm use --lts
+npm install
+echo "Running NPM build..."
+npm run build
 
 echo -e "\n\e[32mSetup complete!\e[0m"
