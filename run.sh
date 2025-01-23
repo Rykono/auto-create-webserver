@@ -23,7 +23,7 @@ read -p "GitHub Repository (xxxxx.git): " githubres
 # Update and install necessary packages
 echo "Updating system and installing dependencies..."
 run_with_progress "sudo apt update && sudo apt upgrade -y" "System update and upgrade"
-run_with_progress "sudo apt install -y apache2 mysql-server php php-bcmath php-ctype php-json php-xml php-pdo php-mbstring php-curl php-gd php-imagick php-zip redis composer curl" "Installing dependencies"
+run_with_progress "sudo apt install -y apache2 mysql-server php php-bcmath php-ctype php-json php-xml php-pdo php-mbstring php-curl php-gd php-imagick php-zip redis composer curl build-essential" "Installing dependencies"
 
 # Install NVM
 echo "Installing NVM..."
