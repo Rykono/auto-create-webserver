@@ -23,7 +23,19 @@ read -p "GitHub Repository (xxxxx.git): " githubres
 # Update and install necessary packages
 echo "Updating system and installing dependencies..."
 run_with_progress "sudo apt update && sudo apt upgrade -y" "System update and upgrade"
-run_with_progress "sudo apt install -y apache2 mysql-server php php-bcmath php-ctype php-json php-xml php-pdo php-mbstring php-curl php-gd php-imagick php-zip redis composer curl build-essential" "Installing dependencies"
+run_with_progress "sudo apt install -y software-properties-common" "Installing software-properties-common"
+
+# Add PHP 8.2 repository
+echo "Adding PHP 8.2 repository..."
+run_with_progress "sudo add-apt-repository ppa:ondrej/php -y" "Adding Ondřej PHP repository"
+run_with_progress "sudo apt update" "Updating package lists"
+
+# Install PHP 8.2 and extensions
+echo "Installing PHP 8.2 and required extensions..."
+run_with_progress "sudo apt install -y php8.2 php8.2-bcmath php8.2-ctype php8.2-json php8.2-xml php8.2-pdo php8.2-mbstring php8.2-curl php8.2-gd php8.2-imagick php8.2-zip" "Installing PHP 8.2 and extensions"
+
+# Install other necessary dependencies
+run_with_progress "sudo apt install -y apache2 mysql-server redis composer curl build-essential python3" "Installing other dependencies"
 
 # Install NVM
 echo "Installing NVM..."
