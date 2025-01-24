@@ -96,7 +96,5 @@ echo "Running NVM setup and NPM install..."
 nvm install --lts
 nvm use --lts
 npm install
-echo "Running NPM build..."
-npm run build
 
-echo -e "\n\e[32mSetup complete!\e[0m"
+echo -e "\n\e[32mSetup complete! Configure Vite and then npm run build.\e[0m"
